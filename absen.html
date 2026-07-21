@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Absensi Harian - Absen Guru MMU</title>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cinzel:wght@500;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <img src="assets/logo.png" alt="Logo" class="sidebar-logo-img">
+        <span>AbsenGuru</span>
+      </div>
+      <div class="hijri-display" id="hijriSidebar"></div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="index.html" class="nav-item"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
+      <a href="jadwal.html" class="nav-item"><i data-lucide="calendar-days"></i><span>Jadwal & Data</span></a>
+      <a href="absen.html" class="nav-item active"><i data-lucide="clipboard-check"></i><span>Absensi</span></a>
+      <a href="rekap.html" class="nav-item"><i data-lucide="bar-chart-3"></i><span>Rekap Laporan</span></a>
+      <a href="manajemen-user.html" class="nav-item nav-admin-only" style="display:none;"><i data-lucide="users"></i><span>Kelola User</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="gregorian-display" id="gregorianSidebar"></div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <header class="top-bar">
+      <button class="menu-toggle" id="menuToggle"><i data-lucide="menu"></i></button>
+      <div class="page-title">
+        <h1>Absensi Harian</h1>
+        <p class="subtitle" id="todayDisplay"></p>
+      </div>
+      <div class="top-bar-right">
+        <div class="user-info">
+          <div class="user-name" id="userName">-</div>
+          <div class="user-role" id="userRole">-</div>
+        </div>
+        <button class="btn-logout" id="btnLogout"><i data-lucide="log-out"></i> Keluar</button>
+      </div>
+    </header>
+
+    <div class="content-area">
+      
+      <!-- Pengaturan Tanggal & Lembaga -->
+      <div class="card" style="margin-bottom: 25px;">
+        <div class="card-body" style="display: flex; gap: 20px; align-items: flex-end; flex-wrap: wrap;">
+          <div class="form-group" style="flex: 1; min-width: 200px; margin-bottom: 0;">
+            <label>Tanggal Absensi</label>
+            <input type="date" id="tanggalAbsen" required>
+          </div>
+          <div class="form-group lembaga-select-wrapper" style="flex: 1; min-width: 200px; margin-bottom: 0; display: none;">
+            <label>Lembaga</label>
+            <select id="absenLembaga"><option value="">Pilih Lembaga</option></select>
+          </div>
+            <button class="btn btn-accent" id="btnHariIni" style="height: 46px;">
+            <i data-lucide="calendar-check"></i> Hari Ini
+          </button>
+          <button class="btn btn-primary" id="btnLoadAbsen" style="height: 46px;">
+            <i data-lucide="search"></i> Tampilkan
+          </button>
+        </div>
+        <div style="margin-top: 10px; font-weight: 600; color: var(--primary);" id="hijriDisplay"></div>
+      </div>
+
+      <!-- Container Kelas & Jadwal -->
+      <div id="kelasContainer">
+        <div class="empty-state" style="padding: 50px 0; text-align: center; color: #64748b;">
+          Silakan pilih tanggal dan klik Tampilkan
+        </div>
+      </div>
+
+      <!-- Tombol Simpan Semua -->
+      <div style="margin-top: 30px; text-align: center; display: none;" id="btnSimpanWrapper">
+        <button class="btn btn-primary" style="padding: 15px 40px; font-size: 1.1rem;" id="btnSimpanAbsen">
+          <i data-lucide="save"></i> Simpan Semua Absensi
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/hijri.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/toast.js"></script>
+  <script src="js/absen.js"></script>
+</body>
+</html>
