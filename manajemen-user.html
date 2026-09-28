@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manajemen Sistem - Absen Guru MMU</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/png" href="assets/logo.png">
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <img src="assets/logo.png" alt="Logo" class="sidebar-logo-img">
+        <span>AbsenGuru</span>
+      </div>
+      <div class="hijri-display" id="hijriSidebar"></div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="index.html" class="nav-item"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
+      <a href="jadwal.html" class="nav-item"><i data-lucide="calendar-days"></i><span>Jadwal & Data</span></a>
+      <a href="absen.html" class="nav-item"><i data-lucide="clipboard-check"></i><span>Absensi</span></a>
+      <a href="rekap.html" class="nav-item"><i data-lucide="bar-chart-3"></i><span>Rekap Laporan</span></a>
+      <a href="manajemen-user.html" class="nav-item active"><i data-lucide="settings"></i><span>Manajemen</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="gregorian-display" id="gregorianSidebar"></div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <header class="top-bar">
+      <button class="menu-toggle" id="menuToggle"><i data-lucide="menu"></i></button>
+      <div class="page-title">
+        <h1>Manajemen Sistem</h1>
+        <p class="subtitle" id="todayDisplay"></p>
+      </div>
+      <div class="top-bar-right">
+        <div class="user-info">
+          <div class="user-name" id="userName">-</div>
+          <div class="user-role" id="userRole">-</div>
+        </div>
+        <button class="btn-logout" id="btnLogout"><i data-lucide="log-out"></i> Keluar</button>
+      </div>
+    </header>
+
+    <div class="content-area">
+      
+      <!-- Tab Navigation -->
+      <div class="tab-nav">
+        <button class="tab-btn active" data-tab="tab-user">Kelola User</button>
+        <button class="tab-btn" data-tab="tab-libur">Hari Libur</button>
+        <button class="tab-btn" data-tab="tab-hijri"><i data-lucide="moon-star"></i> Kalender Hijriyah</button>
+      </div>
+
+      <!-- Tab 1: Kelola User -->
+      <div class="tab-content active" id="tab-user">
+        <div class="card" style="margin-bottom: 25px;">
+          <div class="card-header"><h3>Tambah User Baru</h3></div>
+          <div class="card-body">
+            <form id="userForm" class="form-grid-4">
+              <div class="form-group">
+                <label>Nama Lengkap</label>
+                <input type="text" id="userNama" placeholder="Nama di sistem" required>
+              </div>
+              <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="userUsername" placeholder="Untuk login" required>
+              </div>
+              <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="userPassword" placeholder="Min. 6 karakter" required>
+              </div>
+              <div class="form-group">
+                <label>Role</label>
+                <select id="userRoleSelect" required>
+                  <option value="">Pilih Role</option>
+                  <option value="superadmin">Superadmin</option>
+                  <option value="admin_ibt">Admin Ibtidaiyah</option>
+                  <option value="admin_ts">Admin Tsanawiyah</option>
+                  <option value="admin_idad">Admin Idadiyah</option>
+                  <option value="pengabsen_ibt">Pengabsen Ibtidaiyah</option>
+                  <option value="pengabsen_ts">Pengabsen Tsanawiyah</option>
+                  <option value="pengabsen_idad">Pengabsen Idadiyah</option>
+                  <option value="pembaca_rekap">Pembaca Rekap</option>
+                </select>
+              </div>
+              <div class="form-group" id="userLembagaGroup" style="display:none;">
+                <label>Lembaga</label>
+                <select id="userLembaga"><option value="">Pilih Lembaga</option></select>
+              </div>
+              <div class="form-group form-action">
+                <button type="submit" class="btn btn-primary" style="width:100%;"><i data-lucide="user-plus"></i> Simpan User</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><h3>Daftar User</h3></div>
+          <div class="card-body">
+            <div class="table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>No</th>
+                    <th>Nama</th>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Lembaga</th>
+                    <th class="action-col">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="userTable">
+                  <tr><td colspan="6" class="empty-state">Memuat data...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Hari Libur -->
+      <div class="tab-content" id="tab-libur">
+        <div class="card" style="margin-bottom: 25px;">
+          <div class="card-header"><h3>Tambah Hari Libur</h3></div>
+          <div class="card-body">
+            <form id="liburForm" class="form-inline">
+              <div class="form-group" style="flex: 0.8; margin-bottom: 0;">
+                <label>Tanggal</label>
+                <input type="date" id="liburTanggal" required>
+              </div>
+              <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                <label>Lembaga</label>
+                <select id="liburLembaga" required>
+                  <option value="all">Semua Lembaga</option>
+                </select>
+              </div>
+              <div class="form-group" style="flex: 1.5; margin-bottom: 0;">
+                <label>Keterangan</label>
+                <input type="text" id="liburKeterangan" placeholder="Contoh: Isra Mi'raj, Libur Nasional" required>
+              </div>
+              <button type="submit" class="btn btn-primary" style="height: 44px;"><i data-lucide="plus"></i> Simpan</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><h3>Daftar Hari Libur Akan Datang</h3></div>
+          <div class="card-body">
+            <div class="table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Tanggal</th>
+                    <th>Hijriyah</th>
+                    <th>Lembaga</th>
+                    <th>Keterangan</th>
+                    <th class="action-col">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="liburTable">
+                  <tr><td colspan="5" class="empty-state">Memuat data...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Kalender Hijriyah -->
+<div class="tab-content" id="tab-hijri">
+
+  <div class="card">
+    <div class="card-header"><h3>Set Awal Bulan Hijriyah</h3><i data-lucide="moon-star" class="header-icon"></i></div>
+    <div class="card-body">
+      <div class="hijri-info-box">
+        <i data-lucide="info"></i>
+        <p>
+          Tentukan awal setiap bulan Hijriyah sesuai rujukan resmi.
+          Contoh: <strong>Bulan Safar 1448 H dimulai tanggal 20 Januari 2026</strong> —
+          maka 20 Jan dihitung sebagai 1 Safar, 21 Jan sebagai 2 Safar, dan seterusnya
+          sampai bulan berikutnya di-set. Seluruh tanggal di aplikasi (dashboard, absensi, rekap)
+          otomatis mengikuti pengaturan ini.
+        </p>
+      </div>
+      <form id="hijriForm" class="form-inline">
+        <div class="form-group fg-grow">
+          <label>Bulan Hijriyah</label>
+          <select id="hijriBulan"></select>
+        </div>
+        <div class="form-group fg-sm">
+          <label>Tahun Hijriyah</label>
+          <input type="number" id="hijriTahun" min="1440" max="1500" required>
+        </div>
+        <div class="form-group fg-md">
+          <label>Tanggal Mulai (Masehi)</label>
+          <input type="date" id="hijriTanggal" required>
+        </div>
+        <button type="submit" class="btn btn-primary"><i data-lucide="save"></i> Simpan</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h3>Daftar Kalender Hijriyah</h3></div>
+    <div class="card-body">
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr><th>Bulan</th><th>Tahun</th><th>Mulai (Masehi)</th><th>Berlaku Sampai</th><th class="action-col">Aksi</th></tr>
+          </thead>
+          <tbody id="hijriTable">
+            <tr><td colspan="5" class="empty-state">Memuat data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+    </div>
+  </main>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/hijri.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/toast.js"></script>
+  <script src="js/manajemen-user.js"></script>
+</body>
+</html>
