@@ -6,16 +6,14 @@
   <title>Rekap Laporan - Absen Guru MMU</title>
   <link rel="icon" type="image/png" href="assets/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/rekap.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 
-  <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <div class="sidebar-logo">
@@ -36,13 +34,14 @@
     </div>
   </aside>
 
-  <!-- Main Content -->
   <main class="main-content">
     <header class="top-bar">
-      <button class="menu-toggle" id="menuToggle"><i data-lucide="menu"></i></button>
-      <div class="page-title">
-        <h1>Rekap Laporan</h1>
-        <p class="subtitle" id="todayDisplay"></p>
+      <div class="top-bar-left">
+        <button class="menu-toggle" id="menuToggle" aria-label="Buka menu"><i data-lucide="menu"></i></button>
+        <div class="page-title">
+          <h1>Rekap Laporan</h1>
+          <p class="subtitle" id="todayDisplay"></p>
+        </div>
       </div>
       <div class="top-bar-right">
         <div class="user-info">
@@ -54,111 +53,96 @@
     </header>
 
     <div class="content-area">
-      
-      <!-- Filter Bulan Hijriyah -->
+
+      <!-- Filter -->
       <div class="card rekap-filter-card">
-        <div class="card-header"><h3>Filter Rekap Bulanan</h3></div>
-        <div class="card-body" style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
-          
-          <div class="form-group" style="flex: 1; min-width: 150px; margin-bottom: 0;">
-            <label>Bulan Hijriyah</label>
-            <select id="filterBulan">
-              <option value="1">Muharram</option>
-              <option value="2">Safar</option>
-              <option value="3">Rabi'ul Awal</option>
-              <option value="4">Rabi'ul Akhir</option>
-              <option value="5">Jumadil Ula</option>
-              <option value="6">Jumadil Akhirah</option>
-              <option value="7">Rajab</option>
-              <option value="8">Sya'ban</option>
-              <option value="9">Ramadhan</option>
-              <option value="10">Syawwal</option>
-              <option value="11">Dzulqa'dah</option>
-              <option value="12">Dzulhijjah</option>
-            </select>
+        <div class="card-header">
+          <h3>Filter Rekap</h3>
+          <span class="card-chip" id="rekapRangeChip">-</span>
+        </div>
+        <div class="card-body">
+          <div class="form-inline">
+            <div class="form-group lembaga-select-wrapper">
+              <label>Lembaga</label>
+              <select id="rekapLembaga"><option value="">Semua Lembaga</option></select>
+            </div>
+            <div class="form-group fg-md">
+              <label>Tanggal Mulai</label>
+              <input type="date" id="rekapStart">
+            </div>
+            <div class="form-group fg-md">
+              <label>Tanggal Selesai</label>
+              <input type="date" id="rekapEnd">
+            </div>
+            <button class="btn btn-primary" id="btnTampilkan"><i data-lucide="search"></i> Tampilkan</button>
+            <button class="btn btn-secondary" id="btnBulanIni"><i data-lucide="moon-star"></i> Bulan Ini</button>
           </div>
-
-          <!-- Tahun Diganti Jadi Dropdown -->
-          <div class="form-group" style="flex: 0.5; min-width: 120px; margin-bottom: 0;">
-            <label>Tahun H</label>
-            <select id="filterTahun">
-              <!-- Akan diisi oleh JS -->
-            </select>
-          </div>
-
-          <div class="form-group lembaga-select-wrapper" style="flex: 1; min-width: 150px; margin-bottom: 0; display: none;">
-            <label>Lembaga</label>
-            <select id="rekapLembaga"><option value="">Semua Lembaga</option></select>
-          </div>
-          
-          <button class="btn btn-primary" id="btnTampilkan" style="height: 44px;">
-            <i data-lucide="filter"></i> Tampilkan
-          </button>
         </div>
       </div>
 
-            <!-- Area yang akan dijadikan Gambar -->
-      <div id="captureArea" style="background: white; padding: 10px;">
-
-        <!-- Header untuk Gambar (Akan tersembunyi di web, muncul saat download) -->
-        <div id="captureHeader" style="display: none; text-align: center; padding: 20px 0; border-bottom: 3px solid var(--primary); margin-bottom: 15px;">
-          <h2 style="margin:0; color: var(--primary); font-family: 'Cinzel', serif;">Rekap Kehadiran Guru</h2>
-          <h3 style="margin:5px 0 0; color: #333; font-weight: 400;" id="captureSubtitle">MMU Ranting B-10 Patereman</h3>
-          <p style="margin:5px 0 0; color: #666; font-size: 0.9rem;" id="captureBulanTahun"></p>
+      <!-- Statistik Ringkas -->
+      <div class="rekap-stats" id="rekapStats">
+        <div class="rekap-stat-item">
+          <span class="value" id="rsGuru">0</span>
+          <span class="label">Total Guru</span>
         </div>
-
-        <!-- Statistik Ringkas -->
-        <div class="rekap-stats" id="rekapStats" style="display: none;">
-          <div class="rekap-stat-item"><div class="value" id="statTotalGuru">0</div><div class="label">Total Guru</div></div>
-          <div class="rekap-stat-item"><div class="value" id="statHariKerja">0</div><div class="label">Hari Kerja</div></div>
-          <div class="rekap-stat-item"><div class="value" id="statRataHadir">0%</div><div class="label">Rata-rata Kehadiran</div></div>
+        <div class="rekap-stat-item">
+          <span class="value" id="rsHariKerja">0</span>
+          <span class="label">Hari Kerja</span>
         </div>
+        <div class="rekap-stat-item">
+          <span class="value" id="rsHadir">0</span>
+          <span class="label">Total Hadir</span>
+        </div>
+        <div class="rekap-stat-item">
+          <span class="value" id="rsRata">0%</span>
+          <span class="label">Rata-rata</span>
+        </div>
+      </div>
 
-        <!-- Tabel Rekap -->
-        <div class="card">
-          <div class="card-header">
-            <h3>Peringkat Kehadiran Guru</h3>
+      <!-- Tabel Rekap -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Rekap Kehadiran Guru</h3>
+          <i data-lucide="bar-chart-3" class="header-icon"></i>
+        </div>
+        <div class="card-body">
+          <div class="table-wrapper">
+            <table class="rekap-table">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Nama Guru</th>
+                  <th>HK</th>
+                  <th>Hadir</th>
+                  <th>Sakit</th>
+                  <th>Izin</th>
+                  <th>Alpha</th>
+                  <th>Tanpa Ket.</th>
+                  <th>Persentase</th>
+                </tr>
+              </thead>
+              <tbody id="rekapTable">
+                <tr><td colspan="9" class="empty-state">Memuat data...</td></tr>
+              </tbody>
+            </table>
           </div>
-          <div class="card-body">
-            <div class="table-wrapper">
-              <table class="rekap-table">
-                <thead>
-                  <tr>
-                    <th>Rank</th>
-                    <th style="text-align: left;">Nama Guru</th>
-                    <th>Total Jam</th> <!-- KOLOM BARU -->
-                    <th>Hadir</th>
-                    <th>Sakit</th>
-                    <th>Izin</th>
-                    <th>Alpha</th>
-                    <th>Jam Tambahan</th>
-                    <th>Persentase</th>
-                  </tr>
-                </thead>
-                <tbody id="rekapTableBody">
-                  <tr><td colspan="9" class="empty-state">Pilih bulan dan tahun untuk melihat rekap</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
         </div>
+      </div>
 
-      </div> <!-- End Capture Area -->
-
-            <!-- Tombol Export -->
-      <div class="export-section" id="exportSection" style="display: none; gap: 10px;">
-        <button class="btn btn-success" id="btnExportImage"><i data-lucide="image"></i> Download Gambar</button>
-        <button class="btn btn-accent" id="btnExportCSV"><i data-lucide="file-down"></i> Export ke CSV</button>
-        <!-- TOMBOOL BARU DI SINI -->
-        <button class="btn btn-primary" id="btnCopyWA"><i data-lucide="copy"></i> Salin Laporan Hari Ini (WA)</button>
+      <!-- Export -->
+      <div class="export-section">
+        <button class="btn-success" id="btnExportCsv">
+          <i data-lucide="download"></i> Unduh CSV (Excel)
+        </button>
       </div>
 
     </div>
   </main>
 
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div id="toast-container"></div>
 
-  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js"></script>
   <script src="js/hijri.js"></script>
