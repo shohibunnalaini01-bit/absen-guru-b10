@@ -1,0 +1,214 @@
+/* css/rekap.css */
+/* Khusus Halaman Rekap — Senada Tema Emerald + Amber */
+
+.rekap-filter-card {
+    margin-bottom: 30px;
+}
+
+/* ========================
+   STATISTIK RINGKASAN
+======================== */
+.rekap-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+    margin-bottom: 25px;
+}
+
+.rekap-stat-item {
+    background: linear-gradient(135deg, #ecfdf5, #ffffff 70%);
+    padding: 18px 15px;
+    border-radius: 14px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.rekap-stat-item:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.rekap-stat-item .value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--primary-deep);
+    font-family: 'Cinzel', serif;
+    line-height: 1.2;
+}
+
+.rekap-stat-item .label {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-top: 5px;
+}
+
+/* ========================
+   TABEL REKAP
+======================== */
+.rekap-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+}
+
+.rekap-table th, .rekap-table td {
+    padding: 12px 15px;
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.rekap-table th {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-deep));
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+.rekap-table tbody tr:hover {
+    background-color: #f7fbf8;
+}
+
+.rekap-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.rekap-table td:nth-child(2) {
+    text-align: left;
+    font-weight: 500;
+}
+
+/* ========================
+   RANKING BADGES (Emas / Perak / Perunggu)
+======================== */
+.rank-1, .rank-2, .rank-3 {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    box-shadow: 0 4px 10px rgba(6, 78, 59, 0.18);
+}
+
+.rank-1 {
+    background: linear-gradient(135deg, #fde047, #f59e0b);
+    color: #78350f;
+}
+
+.rank-2 {
+    background: linear-gradient(135deg, #e2e8f0, #94a3b8);
+    color: #334155;
+}
+
+.rank-3 {
+    background: linear-gradient(135deg, #fdba74, #c2410c);
+    color: #ffffff;
+}
+
+/* ========================
+   TOMBOL EXPORT
+   (pill gradient, senada btn-success di style.css)
+======================== */
+.export-section {
+    margin-top: 22px;
+    padding-top: 20px;
+    border-top: 1px dashed var(--border-color);
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+/* Tetap jalan walau HTML tidak pakai class .btn */
+.export-section .btn-success {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 11px 24px;
+    border-radius: var(--radius-pill, 50px);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 500;
+    box-shadow: 0 8px 18px rgba(16, 185, 129, 0.3);
+    transition: all 0.25s ease;
+}
+
+.export-section .btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(16, 185, 129, 0.38);
+}
+
+.export-section .btn-success:active {
+    transform: scale(0.98);
+}
+
+.export-section .btn-success i,
+.export-section .btn-success svg {
+    width: 17px;
+    height: 17px;
+}
+
+/* ========================
+   RESPONSIVE
+======================== */
+@media (max-width: 768px) {
+    .rekap-table th, .rekap-table td {
+        padding: 8px 5px;
+        font-size: 0.75rem;
+    }
+
+    .rekap-stat-item .value {
+        font-size: 1.25rem;
+    }
+
+    .export-section {
+        justify-content: stretch;
+    }
+
+    .export-section .btn-success {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ========================
+   PRINT (kalau rekap mau di-print)
+======================== */
+@media print {
+    .sidebar,
+    .top-bar,
+    .export-section,
+    .rekap-filter-card,
+    #toast-container {
+        display: none !important;
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+
+    .card {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+
+    .rekap-table th {
+        background: #f0f7f3 !important;
+        color: #065f46 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}
