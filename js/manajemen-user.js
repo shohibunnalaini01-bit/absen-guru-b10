@@ -1,8 +1,7 @@
 // js/manajemen-user.js
-// Manajemen User + Hari Libur + Kalender Hijriyah Manual
+// Manajemen User + Hari Libur + Hari Ujian + Kalender Hijriyah Manual
 
 document.addEventListener('DOMContentLoaded', async function() {
-    // PENTING: tunggu kalender hijriyah manual termuat dulu
     await HijriCalendar.ready;
 
     const session = Auth.getSession();
@@ -17,17 +16,22 @@ document.addEventListener('DOMContentLoaded', async function() {
     initUI(session);
     handleTabs();
 
-    // User Logic
+    // User
     await loadLembagaDropdown();
     await loadUsers(session);
     handleUserForm(session);
 
-    // Libur Logic
+    // Libur
     await loadLembagaDropdownLibur();
     await loadLibur();
     handleLiburForm();
 
-    // Kalender Hijriyah Logic
+    // Ujian
+    await loadLembagaDropdownUjian();
+    await loadUjian();
+    handleUjianForm();
+
+    // Kalender Hijriyah
     setupHijriCalendar();
     await loadHijriCalendar();
 });
@@ -36,12 +40,14 @@ function initUI(session) {
     const today = new Date();
     const masehiStr = `${['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'][today.getDay()]}, ${today.getDate()} ${['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'][today.getMonth()]} ${today.getFullYear()}`;
     const hijriStr = HijriCalendar.format(today);
-    
+
     document.getElementById('hijriSidebar').textContent = hijriStr;
     document.getElementById('gregorianSidebar').textContent = masehiStr;
     document.getElementById('todayDisplay').textContent = `${hijriStr} | ${masehiStr}`;
     document.getElementById('userName').textContent = session.nama;
     document.getElementById('userRole').textContent = session.role.replace(/_/g, ' ').toUpperCase();
+
+    document.querySelectorAll('.lembaga-select-wrapper').forEach(el => el.style.display = 'block');
 
     const menuToggle = document.getElementById('menuToggle');
     const sidebar = document.getElementById('sidebar');
@@ -71,9 +77,9 @@ function handleTabs() {
     });
 }
 
-// ========================
-// 1. USER LOGIC
-// ========================
+/* ========================
+   1. USER LOGIC
+======================== */
 async function loadLembagaDropdown() {
     const { data } = await db.from('lembaga').select('*').order('kode');
     if (data) {
@@ -102,7 +108,12 @@ function handleUserForm(session) {
 
         const { error } = await db.from('users').insert({ nama, username, password, role, lembaga_id });
         if (error) { showToast('Gagal: ' + error.message, 'error'); }
-        else { showToast('User berhasil ditambahkan', 'success'); document.getElementById('userForm').reset(); document.getElementById('userLembagaGroup').style.display = 'none'; loadUsers(session); }
+        else {
+            showToast('User berhasil ditambahkan', 'success');
+            document.getElementById('userForm').reset();
+            document.getElementById('userLembagaGroup').style.display = 'none';
+            loadUsers(session);
+        }
     });
 }
 
@@ -145,9 +156,9 @@ async function deleteUser(id, name) {
     });
 }
 
-// ========================
-// 2. HARI LIBUR LOGIC
-// ========================
+/* ========================
+   2. HARI LIBUR LOGIC
+======================== */
 async function loadLembagaDropdownLibur() {
     const { data } = await db.from('lembaga').select('*').order('kode');
     const select = document.getElementById('liburLembaga');
@@ -161,7 +172,7 @@ function handleLiburForm() {
         const tanggal = document.getElementById('liburTanggal').value;
         const lembagaVal = document.getElementById('liburLembaga').value;
         const keterangan = document.getElementById('liburKeterangan').value;
-        
+
         let inserts = [];
         if (lembagaVal === 'all') {
             const { data: lembagas } = await db.from('lembaga').select('id');
@@ -179,7 +190,7 @@ function handleLiburForm() {
 async function loadLibur() {
     const d = new Date();
     const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    
+
     const { data, error } = await db.from('hari_libur').select('*, lembaga(kode)').gte('tanggal', today).order('tanggal');
     const tbody = document.getElementById('liburTable');
 
@@ -216,11 +227,87 @@ async function deleteLibur(id, name) {
     });
 }
 
-// ========================
-// 3. KALENDER HIJRIYAH MANUAL
-// ========================
+/* ========================
+   3. HARI UJIAN LOGIC
+======================== */
+async function loadLembagaDropdownUjian() {
+    const { data } = await db.from('lembaga').select('*').order('kode');
+    const select = document.getElementById('ujianLembaga');
+    select.innerHTML = '<option value="">Semua Lembaga</option>';
+    if (data) data.forEach(l => select.innerHTML += `<option value="${l.id}">${l.kode} - ${l.nama}</option>`);
+}
+
+function handleUjianForm() {
+    document.getElementById('ujianForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const mulai = document.getElementById('ujianMulai').value;
+        const selesai = document.getElementById('ujianSelesai').value;
+        const keterangan = document.getElementById('ujianKeterangan').value;
+        const lembagaVal = document.getElementById('ujianLembaga').value;
+
+        if (selesai < mulai) { showToast('Tanggal selesai harus setelah tanggal mulai', 'warning'); return; }
+
+        const { error } = await db.from('hari_ujian').insert({
+            tanggal_mulai: mulai,
+            tanggal_selesai: selesai,
+            keterangan,
+            lembaga_id: lembagaVal || null
+        });
+
+        if (error) { showToast('Gagal: ' + error.message, 'error'); return; }
+        showToast('Hari ujian berhasil ditambahkan', 'success');
+        document.getElementById('ujianForm').reset();
+        loadUjian();
+    });
+}
+
+async function loadUjian() {
+    const d = new Date();
+    const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+    const { data, error } = await db.from('hari_ujian')
+        .select('*, lembaga(kode)')
+        .gte('tanggal_selesai', today)
+        .order('tanggal_mulai');
+
+    const tbody = document.getElementById('ujianTable');
+    if (error || !data.length) {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Belum ada hari ujian</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = data.map(u => `
+        <tr>
+            <td class="cell-strong">${formatTanggalID(u.tanggal_mulai)}</td>
+            <td class="cell-strong">${formatTanggalID(u.tanggal_selesai)}</td>
+            <td><span class="kode-chip">${u.lembaga ? u.lembaga.kode : 'Semua'}</span></td>
+            <td>${u.keterangan || '-'}</td>
+            <td class="action-col">
+                <button class="btn-icon btn-icon-delete" onclick="deleteUjian('${u.id}', '${(u.keterangan || 'Hari Ujian').replace(/'/g, "\\'")}')" title="Hapus"><i data-lucide="trash-2"></i></button>
+            </td>
+        </tr>
+    `).join('');
+    lucide.createIcons();
+}
+
+async function deleteUjian(id, name) {
+    showConfirmModal({
+        title: 'Hapus Hari Ujian',
+        message: `Yakin ingin menghapus <strong>${name}</strong>? Tanggal pada rentang itu akan kembali dihitung sebagai hari kerja normal.`,
+        onConfirm: async (close) => {
+            const { error } = await db.from('hari_ujian').delete().eq('id', id);
+            if (error) { showToast('Gagal menghapus: ' + error.message, 'error'); return; }
+            showToast('Hari ujian berhasil dihapus', 'success');
+            close();
+            loadUjian();
+        }
+    });
+}
+
+/* ========================
+   4. KALENDER HIJRIYAH MANUAL
+======================== */
 function setupHijriCalendar() {
-    // Isi dropdown bulan + default nilai hari ini
     const bulanSelect = document.getElementById('hijriBulan');
     bulanSelect.innerHTML = HijriCalendar.monthNames
         .map((nama, i) => `<option value="${i + 1}">${i + 1}. ${nama}</option>`)
@@ -234,7 +321,6 @@ function setupHijriCalendar() {
     }
     document.getElementById('hijriTanggal').value = todayLocal();
 
-    // Submit form
     document.getElementById('hijriForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const bulan = parseInt(document.getElementById('hijriBulan').value);
@@ -243,7 +329,6 @@ function setupHijriCalendar() {
 
         if (!bulan || !tahun || !tanggal) { showToast('Lengkapi semua field', 'warning'); return; }
 
-        // Cek apakah kombinasi bulan+tahun sudah ada → update, kalau belum → insert
         const { data: existing } = await db.from('kalender_hijri')
             .select('id')
             .eq('bulan_hijri', bulan)
@@ -265,7 +350,6 @@ function setupHijriCalendar() {
             showToast(`${namaBulan} ${tahun} H dimulai ${formatTanggalID(tanggal)}`, 'success');
         }
 
-        // Sinkronkan cache global agar semua tanggal langsung akurat
         await HijriCalendar.reloadManual();
         loadHijriCalendar();
     });
@@ -282,13 +366,11 @@ async function loadHijriCalendar() {
         return;
     }
 
-    // Sinkronkan cache juga saat load
     HijriCalendar.manualCalendar = data;
 
     tbody.innerHTML = data.map((row, i) => {
-        const namaBulan = `${HijriCalendar.monthNames[row.bulan_hijri - 1]}`;
+        const namaBulan = HijriCalendar.monthNames[row.bulan_hijri - 1];
 
-        // Berlaku sampai = sehari sebelum awal bulan berikutnya
         let berlakuSampai = 'Sampai bulan berikutnya di-set';
         if (i < data.length - 1) {
             const nextStart = new Date(data[i + 1].tanggal_mulai + 'T00:00:00');
@@ -296,7 +378,6 @@ async function loadHijriCalendar() {
             berlakuSampai = formatTanggalID(toLocalDateStr(nextStart));
         }
 
-        // Hari ini masuk bulan ini?
         const h = HijriCalendar.toHijri(new Date());
         const isAktif = h && h.month === row.bulan_hijri && h.year === row.tahun_hijri;
         const aktifBadge = isAktif ? '<span class="hijri-aktif">Bulan Ini</span>' : '';
@@ -329,9 +410,9 @@ async function deleteHijri(id, name) {
     });
 }
 
-// ========================
-// UTIL
-// ========================
+/* ========================
+   UTIL
+======================== */
 function todayLocal() {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -346,7 +427,6 @@ function formatTanggalID(dateStr) {
     return d.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 }
 
-// Modal konfirmasi
 function showConfirmModal({ title = 'Konfirmasi', message, confirmLabel = 'Ya, Hapus', onConfirm }) {
     let modal = document.getElementById('confirmModal');
     if (!modal) {
