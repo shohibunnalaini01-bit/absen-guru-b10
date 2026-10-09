@@ -3,13 +3,12 @@
    Absen Guru MMU — Tema Emerald + Amber (AL ANWAR)
    ------------------------------------------------------------
    Struktur:
-   01. Design Tokens        07. Tabs
-   02. Reset & Base         08. Modal
-   03. Sidebar              09. Toast
-   04. Main & Top Bar       10. Spinner & Loading
-   05. Komponen Umum        11. Per Halaman (Dashboard/Jadwal/
-   06. Table & Badge            Absensi/Manajemen/Rekap)
-                            12. Responsive
+   01. Design Tokens        07. Modal
+   02. Reset & Base         08. Toast
+   03. Sidebar              09. Spinner & Loading
+   04. Main & Top Bar       10. Per Halaman (Dashboard / Jadwal /
+   05. Komponen Umum            Absensi / Manajemen / Rekap)
+   06. Tabs (Trapezoid)     11. Responsive
    ============================================================ */
 
 /* ============================================================
@@ -661,47 +660,97 @@ input[type="checkbox"] { accent-color: var(--primary); }
   opacity: 0.7;
 }
 
-/* ---------- Tabs ---------- */
-.tab-nav {
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-bottom: 24px;
-  background: #e2ede6;
-  padding: 5px;
-  border-radius: var(--radius-pill);
+/* ---------- Sidebar overlay ---------- */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(6, 78, 59, 0.5);
+  backdrop-filter: blur(2px);
+  z-index: 99;
 }
 
+.sidebar-overlay.show { display: block; }
+
+/* ============================================================
+   06. TABS (TRAPEZOID ALA FOLDER BROWSER)
+============================================================ */
+.tab-nav {
+  display: flex;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  gap: 6px;
+  margin-bottom: 24px;
+  padding: 0 14px;
+  border-bottom: 3px solid var(--primary-deep);
+}
+
+.tab-nav::-webkit-scrollbar { display: none; }
+
 .tab-btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 9px 20px;
-  background: transparent;
+  padding: 12px 26px;
+  margin-bottom: -3px;
+  background: #ffffff;
   border: none;
+  border-radius: 12px 12px 0 0;
   cursor: pointer;
   font-size: 0.86rem;
-  font-weight: 500;
+  font-weight: 600;
   font-family: var(--font-body);
   color: var(--text-secondary);
-  border-radius: var(--radius-pill);
-  transition: all 0.25s ease;
+  white-space: nowrap;
+  transition: all 0.2s ease;
 }
 
 .tab-btn svg { width: 15px; height: 15px; }
-.tab-btn:hover { color: var(--primary-deep); }
+
+/* Sayap miring kiri & kanan — bentuk trapezoid */
+.tab-btn::before,
+.tab-btn::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  width: 18px;
+  height: 100%;
+  background: inherit;
+  z-index: -1;
+}
+
+.tab-btn::before {
+  left: -13px;
+  transform: skewX(-12deg);
+  border-radius: 12px 0 0 0;
+}
+
+.tab-btn::after {
+  right: -13px;
+  transform: skewX(12deg);
+  border-radius: 0 12px 0 0;
+}
+
+.tab-btn:hover {
+  color: var(--primary-deep);
+  background: #eef7f2;
+}
 
 .tab-btn.active {
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-  color: white;
-  font-weight: 600;
-  box-shadow: 0 6px 14px rgba(5, 150, 105, 0.3);
+  background: var(--primary-deep);
+  color: #ffffff;
+  font-weight: 700;
+  z-index: 2;
 }
 
 .tab-content { display: none; }
 .tab-content.active { display: block; }
 
-/* ---------- Modal ---------- */
+/* ============================================================
+   07. MODAL
+============================================================ */
 .modal-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -831,7 +880,9 @@ input[type="checkbox"] { accent-color: var(--primary); }
 .confirm-title { font-family: var(--font-heading); margin-bottom: 6px; }
 .confirm-message { color: var(--text-secondary); font-size: 0.9rem; }
 
-/* ---------- Toast ---------- */
+/* ============================================================
+   08. TOAST
+============================================================ */
 #toast-container {
   position: fixed;
   top: 24px;
@@ -937,7 +988,9 @@ input[type="checkbox"] { accent-color: var(--primary); }
 .toast-card.error .toast-icon { background: var(--danger); }
 .toast-card.error .toast-title { color: #b91c1c; }
 
-/* ---------- Spinner & Loading ---------- */
+/* ============================================================
+   09. SPINNER & LOADING
+============================================================ */
 .spin-icon {
   width: 16px;
   height: 16px;
@@ -967,20 +1020,8 @@ input[type="checkbox"] { accent-color: var(--primary); }
 
 .absen-loading p { font-size: 0.9rem; }
 
-/* ---------- Sidebar overlay ---------- */
-.sidebar-overlay {
-  display: none;
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(6, 78, 59, 0.5);
-  backdrop-filter: blur(2px);
-  z-index: 99;
-}
-
-.sidebar-overlay.show { display: block; }
-
 /* ============================================================
-   11a. HALAMAN: DASHBOARD
+   10a. HALAMAN: DASHBOARD
 ============================================================ */
 
 /* --- Bento row: statistik bulan + hari ini --- */
@@ -1538,7 +1579,7 @@ input[type="checkbox"] { accent-color: var(--primary); }
 .absent-list li:last-child { border-bottom: none; }
 
 /* ============================================================
-   11b. HALAMAN: JADWAL & DATA
+   10b. HALAMAN: JADWAL & DATA
 ============================================================ */
 
 /* --- Filter lembaga global (pill) --- */
@@ -1957,7 +1998,7 @@ input[type="checkbox"] { accent-color: var(--primary); }
 }
 
 /* ============================================================
-   11c. HALAMAN: ABSENSI
+   10c. HALAMAN: ABSENSI
 ============================================================ */
 .kelas-card {
   border: 1px solid var(--border-color);
@@ -2029,8 +2070,103 @@ input[type="checkbox"] { accent-color: var(--primary); }
   box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.14);
 }
 
+/* Banner "sudah/belum diabsen" */
+.absen-status-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-radius: var(--border-radius);
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.absen-status-banner > svg {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.asb-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.asb-info strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-main);
+}
+
+.asb-info > span {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin: 2px 0 8px;
+}
+
+.asb-track {
+  height: 6px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.asb-fill {
+  height: 100%;
+  border-radius: 10px;
+  background: var(--primary);
+  transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.asb-none {
+  background: linear-gradient(135deg, #f1f5f4, #ffffff 70%);
+}
+.asb-none > svg { color: var(--text-muted); }
+
+.asb-partial {
+  background: linear-gradient(135deg, #fef9ec, #ffffff 70%);
+  border-color: #fde68a;
+}
+.asb-partial > svg { color: var(--accent-hover); }
+.asb-partial .asb-fill { background: var(--accent-hover); }
+
+.asb-done {
+  background: linear-gradient(135deg, #e8faf1, #ffffff 70%);
+  border-color: #a7f3d0;
+}
+.asb-done > svg { color: var(--primary-dark); }
+
+/* Badge di header kartu rombel */
+.rombel-badge {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+.rombel-badge svg { width: 12px; height: 12px; }
+
+.rb-done {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.rb-belum {
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.85);
+  border: 1px dashed rgba(255, 255, 255, 0.4);
+}
+
 /* ============================================================
-   11d. HALAMAN: MANAJEMEN
+   10d. HALAMAN: MANAJEMEN
 ============================================================ */
 .hijri-info-box {
   display: flex;
@@ -2087,21 +2223,13 @@ input[type="checkbox"] { accent-color: var(--primary); }
 }
 
 /* ============================================================
-   11e. HALAMAN: REKAP (ekstra)
+   10e. HALAMAN: REKAP
 ============================================================ */
+
+/* Statistik & persentase */
 .persen-good { color: var(--primary-deep); font-weight: 700; }
 .persen-mid  { color: var(--accent-dark); font-weight: 700; }
 .persen-low  { color: var(--danger); font-weight: 700; }
-
-.tk-warning {
-  display: inline-block;
-  background: #fef3c7;
-  color: #b45309;
-  font-weight: 600;
-  padding: 2px 9px;
-  border-radius: var(--radius-pill);
-  font-size: 0.75rem;
-}
 
 .jam-chip {
   display: inline-block;
@@ -2119,8 +2247,227 @@ input[type="checkbox"] { accent-color: var(--primary); }
   font-weight: 400;
 }
 
+/* --- Tombol export (WA / Gambar / CSV) --- */
+.btn-export {
+  background: linear-gradient(135deg, #34d399, #059669);
+  color: white;
+  border: none;
+  cursor: pointer;
+  padding: 11px 24px;
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 600;
+  box-shadow: 0 8px 18px rgba(16, 185, 129, 0.3);
+  transition: all 0.25s ease;
+}
+
+.btn-export:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(16, 185, 129, 0.38);
+}
+
+.btn-export:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-export svg { width: 17px; height: 17px; }
+
+.btn-export-wa {
+  background: linear-gradient(135deg, #25d366, #128c7e);
+  box-shadow: 0 8px 18px rgba(37, 211, 102, 0.3);
+}
+.btn-export-wa:hover { box-shadow: 0 12px 24px rgba(37, 211, 102, 0.4); }
+
+.btn-export-img {
+  background: linear-gradient(135deg, #38bdf8, #0284c7);
+  box-shadow: 0 8px 18px rgba(2, 132, 199, 0.3);
+}
+.btn-export-img:hover { box-shadow: 0 12px 24px rgba(2, 132, 199, 0.4); }
+
+/* --- Hint "klik baris untuk detail" --- */
+.rekap-hint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.rekap-hint svg {
+  width: 15px;
+  height: 15px;
+  color: var(--primary);
+}
+
+.rekap-table tbody tr { cursor: pointer; }
+.rekap-table tbody tr:hover td { background: #f0faf5; }
+
+/* --- Modal detail per guru (drill-down) --- */
+.dg-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dg-head h3 { margin: 0; font-size: 1.05rem; }
+
+.dg-sub {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+}
+
+.dg-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.dg-sum-item {
+  background: var(--bg-soft);
+  border: 1px solid var(--border-color);
+  border-radius: 11px;
+  padding: 10px 6px;
+  text-align: center;
+}
+
+.dg-sum-item strong {
+  display: block;
+  font-size: 1.2rem;
+  color: var(--primary-deep);
+}
+
+.dg-sum-item span {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+.dg-filters {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.dg-chip {
+  border: 1px solid var(--border-color);
+  background: #fff;
+  border-radius: var(--radius-pill);
+  padding: 5px 13px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: var(--font-body);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dg-chip:hover {
+  border-color: var(--primary);
+  color: var(--primary-deep);
+}
+
+.dg-chip.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.dg-records {
+  max-height: 45vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dg-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 13px;
+  border: 1px solid var(--border-color);
+  border-radius: 11px;
+  background: var(--bg-soft);
+}
+
+.dg-date {
+  min-width: 130px;
+  flex-shrink: 0;
+}
+
+.dg-date strong {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--primary-deep);
+}
+
+.dg-date small {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+
+.dg-jam {
+  flex: 1;
+  font-size: 0.8rem;
+  color: var(--text-main);
+  min-width: 0;
+}
+
+.dg-jam small {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+
+.dg-tanpa {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border-color);
+}
+
+.dg-tanpa h5 {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  margin: 0 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-main);
+}
+
+.dg-tanpa h5 svg {
+  width: 14px;
+  height: 14px;
+  color: var(--accent-dark);
+}
+
+.dg-tanpa-dates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.dg-tanpa-dates span {
+  background: #fef3c7;
+  color: #b45309;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 11px;
+  border-radius: var(--radius-pill);
+}
+
 /* ============================================================
-   12. RESPONSIVE (semua breakpoint di satu tempat)
+   11. RESPONSIVE (semua breakpoint di satu tempat)
 ============================================================ */
 
 /* ---------- Tablet ≤ 900px ---------- */
@@ -2158,21 +2505,16 @@ input[type="checkbox"] { accent-color: var(--primary); }
   #toast-container { top: 16px; }
   .toast-card { padding: 14px 16px; }
 
-  /* Tab nav: geser samping, scrollbar hilang */
-  .tab-nav {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    margin-bottom: 18px;
-  }
-  .tab-nav::-webkit-scrollbar { display: none; }
+  /* Tab trapezoid: geser samping, lebih rapat */
   .tab-btn {
     flex-shrink: 0;
     padding: 9px 16px;
     font-size: 0.8rem;
   }
+  .tab-btn::before,
+  .tab-btn::after { width: 12px; }
+  .tab-btn::before { left: -9px; }
+  .tab-btn::after { right: -9px; }
 
   /* Form & tombol full width */
   .form-inline { flex-direction: column; align-items: stretch; }
@@ -2202,6 +2544,9 @@ input[type="checkbox"] { accent-color: var(--primary); }
     font-size: 0.75rem;
   }
   .status-radio { gap: 8px; font-size: 0.75rem; }
+  .absen-status-banner { padding: 12px 14px; gap: 10px; }
+  .absen-status-banner > svg { width: 22px; height: 22px; }
+  .rombel-badge { font-size: 0.62rem; padding: 3px 9px; }
 
   /* Tabel data rapat */
   .data-table th,
@@ -2292,6 +2637,16 @@ input[type="checkbox"] { accent-color: var(--primary); }
   .modal-body { padding: 16px 20px 26px; }
   .guru-picker-list { max-height: 46vh; }
   .guru-picker-item { padding: 12px 14px; }
+
+  /* Export tombol stack di HP */
+  .export-section { flex-direction: column; }
+  .export-section .btn-export,
+  .export-section .btn-success {
+    width: 100%;
+    justify-content: center;
+  }
+  .dg-summary { grid-template-columns: repeat(2, 1fr); }
+  .dg-date { min-width: 105px; }
 }
 
 /* ---------- Layar sangat kecil ≤ 420px ---------- */
@@ -2303,345 +2658,4 @@ input[type="checkbox"] { accent-color: var(--primary); }
 @media (max-width: 768px) and (max-height: 500px) {
   .modal-content { max-height: 94vh; }
   .guru-picker-list { max-height: 40vh; }
-}
-
-/* ============================================================
-   11f. HALAMAN: REKAP — EXPORT BUTTONS & DETAIL MODAL
-============================================================ */
-
-/* --- Tombol export (WA / Gambar / CSV) --- */
-.btn-export {
-  background: linear-gradient(135deg, #34d399, #059669);
-  color: white;
-  border: none;
-  cursor: pointer;
-  padding: 11px 24px;
-  border-radius: var(--radius-pill);
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--font-body);
-  font-size: 0.88rem;
-  font-weight: 600;
-  box-shadow: 0 8px 18px rgba(16, 185, 129, 0.3);
-  transition: all 0.25s ease;
-}
-
-.btn-export:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(16, 185, 129, 0.38);
-}
-
-.btn-export:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.btn-export svg { width: 17px; height: 17px; }
-
-/* Varian: WhatsApp (hijau WA) */
-.btn-export-wa {
-  background: linear-gradient(135deg, #25d366, #128c7e);
-  box-shadow: 0 8px 18px rgba(37, 211, 102, 0.3);
-}
-.btn-export-wa:hover { box-shadow: 0 12px 24px rgba(37, 211, 102, 0.4); }
-
-/* Varian: Copy Gambar (biru) */
-.btn-export-img {
-  background: linear-gradient(135deg, #38bdf8, #0284c7);
-  box-shadow: 0 8px 18px rgba(2, 132, 199, 0.3);
-}
-.btn-export-img:hover { box-shadow: 0 12px 24px rgba(2, 132, 199, 0.4); }
-
-/* --- Hint "klik baris untuk detail" --- */
-.rekap-hint {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 14px;
-}
-
-.rekap-hint svg {
-  width: 15px;
-  height: 15px;
-  color: var(--primary);
-}
-
-/* Baris guru bisa diklik → detail */
-.rekap-table tbody tr { cursor: pointer; }
-.rekap-table tbody tr:hover td { background: #f0faf5; }
-
-/* --- Modal detail per guru (drill-down) --- */
-.dg-head {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.dg-head h3 { margin: 0; font-size: 1.05rem; }
-
-.dg-sub {
-  color: var(--text-muted);
-  font-size: 0.72rem;
-}
-
-.dg-summary {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  margin-bottom: 16px;
-}
-
-.dg-sum-item {
-  background: var(--bg-soft);
-  border: 1px solid var(--border-color);
-  border-radius: 11px;
-  padding: 10px 6px;
-  text-align: center;
-}
-
-.dg-sum-item strong {
-  display: block;
-  font-size: 1.2rem;
-  color: var(--primary-deep);
-}
-
-.dg-sum-item span {
-  font-size: 0.62rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--text-muted);
-}
-
-/* Filter chip per hari */
-.dg-filters {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-bottom: 12px;
-}
-
-.dg-chip {
-  border: 1px solid var(--border-color);
-  background: #fff;
-  border-radius: var(--radius-pill);
-  padding: 5px 13px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  font-family: var(--font-body);
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.dg-chip:hover {
-  border-color: var(--primary);
-  color: var(--primary-deep);
-}
-
-.dg-chip.active {
-  background: var(--primary);
-  color: #fff;
-  border-color: var(--primary);
-}
-
-/* Daftar rincian absensi */
-.dg-records {
-  max-height: 45vh;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.dg-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 9px 13px;
-  border: 1px solid var(--border-color);
-  border-radius: 11px;
-  background: var(--bg-soft);
-}
-
-.dg-date {
-  min-width: 130px;
-  flex-shrink: 0;
-}
-
-.dg-date strong {
-  display: block;
-  font-size: 0.82rem;
-  color: var(--primary-deep);
-}
-
-.dg-date small {
-  color: var(--text-muted);
-  font-size: 0.7rem;
-}
-
-.dg-jam {
-  flex: 1;
-  font-size: 0.8rem;
-  color: var(--text-main);
-  min-width: 0;
-}
-
-.dg-jam small {
-  display: block;
-  color: var(--text-muted);
-  font-size: 0.7rem;
-}
-
-/* Hari efektif tanpa keterangan */
-.dg-tanpa {
-  margin-top: 16px;
-  padding-top: 14px;
-  border-top: 1px dashed var(--border-color);
-}
-
-.dg-tanpa h5 {
-  font-family: var(--font-body);
-  font-size: 0.82rem;
-  margin: 0 0 8px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--text-main);
-}
-
-.dg-tanpa h5 svg {
-  width: 14px;
-  height: 14px;
-  color: var(--accent-dark);
-}
-
-.dg-tanpa-dates {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.dg-tanpa-dates span {
-  background: #fef3c7;
-  color: #b45309;
-  font-size: 0.72rem;
-  font-weight: 600;
-  padding: 3px 11px;
-  border-radius: var(--radius-pill);
-}
-
-/* Responsif export & detail */
-@media (max-width: 768px) {
-  .export-section { flex-direction: column; }
-  .export-section .btn-export,
-  .export-section .btn-success {
-    width: 100%;
-    justify-content: center;
-  }
-  .dg-summary { grid-template-columns: repeat(2, 1fr); }
-  .dg-date { min-width: 105px; }
-}
-
-/* ============================================================
-   11c+. HALAMAN: ABSENSI — INDIKATOR STATUS
-============================================================ */
-
-/* Banner ringkasan "sudah/belum diabsen" */
-.absen-status-banner {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  border-radius: var(--border-radius);
-  padding: 16px 20px;
-  margin-bottom: 20px;
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-sm);
-}
-
-.absen-status-banner > svg {
-  width: 28px;
-  height: 28px;
-  flex-shrink: 0;
-}
-
-.asb-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.asb-info strong {
-  display: block;
-  font-size: 0.95rem;
-  color: var(--text-main);
-}
-
-.asb-info > span {
-  display: block;
-  font-size: 0.78rem;
-  color: var(--text-secondary);
-  margin: 2px 0 8px;
-}
-
-.asb-track {
-  height: 6px;
-  border-radius: 10px;
-  background: rgba(0, 0, 0, 0.08);
-  overflow: hidden;
-}
-
-.asb-fill {
-  height: 100%;
-  border-radius: 10px;
-  background: var(--primary);
-  transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-/* Varian warna banner */
-.asb-none {
-  background: linear-gradient(135deg, #f1f5f4, #ffffff 70%);
-}
-.asb-none > svg { color: var(--text-muted); }
-
-.asb-partial {
-  background: linear-gradient(135deg, #fef9ec, #ffffff 70%);
-  border-color: #fde68a;
-}
-.asb-partial > svg { color: var(--accent-hover); }
-.asb-partial .asb-fill { background: var(--accent-hover); }
-
-.asb-done {
-  background: linear-gradient(135deg, #e8faf1, #ffffff 70%);
-  border-color: #a7f3d0;
-}
-.asb-done > svg { color: var(--primary-dark); }
-
-/* Badge di header kartu rombel */
-.rombel-badge {
-  margin-left: auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  padding: 4px 12px;
-  border-radius: var(--radius-pill);
-  white-space: nowrap;
-}
-
-.rombel-badge svg { width: 12px; height: 12px; }
-
-.rb-done {
-  background: rgba(255, 255, 255, 0.25);
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-}
-
-.rb-belum {
-  background: rgba(255, 255, 255, 0.15);
-  color: rgba(255, 255, 255, 0.85);
-  border: 1px dashed rgba(255, 255, 255, 0.4);
 }
