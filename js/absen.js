@@ -1,7 +1,6 @@
 // js/absen.js
-// Halaman Absensi — FINAL v2
-// - "Hadir Semua" SELALU menyimpan (radio default sudah H, jadi tidak melihat perubahan)
-// - Batch query, loading state, anti-duplikat, global lock
+// Halaman Absensi — FINAL v3
+// Tambahan: hari ujian → KBM tidak berjalan (seperti hari libur)
 
 document.addEventListener('DOMContentLoaded', async function() {
     await HijriCalendar.ready;
@@ -152,6 +151,9 @@ async function loadLembagaDropdown(session) {
     }
 }
 
+/* ========================
+   LOAD ABSENSI
+======================== */
 async function loadAbsensi() {
     if (isLoadingAbsen) return;
 
@@ -169,8 +171,27 @@ async function loadAbsensi() {
         document.getElementById('hijriDisplay').textContent = hijriDate;
 
         const dayIndex = new Date(tanggal + 'T00:00:00').getDay();
+
+        // Jumat = libur
         if (dayIndex === 5) {
             document.getElementById('kelasContainer').innerHTML = '<div class="empty-state" style="padding: 40px 0;">Hari Jumat - Libur</div>';
+            document.getElementById('btnActionWrapper').style.display = 'none';
+            return;
+        }
+
+        // Hari ujian = KBM tidak berjalan
+        const { data: ujianRows } = await db.from('hari_ujian')
+            .select('keterangan, lembaga_id')
+            .lte('tanggal_mulai', tanggal)
+            .gte('tanggal_selesai', tanggal);
+
+        const ujianBerlaku = (ujianRows || []).find(u => !u.lembaga_id || u.lembaga_id === lembagaId);
+        if (ujianBerlaku) {
+            document.getElementById('kelasContainer').innerHTML = `
+                <div class="empty-state" style="padding: 40px 0;">
+                    <strong style="color: var(--accent-dark);">Hari Ujian — Tidak Ada KBM</strong><br>
+                    <small>${ujianBerlaku.keterangan || ''}</small>
+                </div>`;
             document.getElementById('btnActionWrapper').style.display = 'none';
             return;
         }
@@ -213,11 +234,8 @@ async function loadAbsensi() {
             absenByRombel[a.rombel_id].push(a);
         });
 
-        /* ===== HITUNG STATUS PER ROMBEL ===== */
-        let rombelTotal = 0;      // rombel yang punya jadwal hari ini
-        let rombelSudah = 0;      // yang sudah tersimpan absennya
-        let slotTotal = 0;
-        let slotTerisi = 0;
+        /* ===== STATUS PER ROMBEL (banner) ===== */
+        let rombelTotal = 0, rombelSudah = 0, slotTotal = 0, slotTerisi = 0;
 
         rombelData.forEach(rombel => {
             const jadwalData = jadwalByRombel[rombel.id] || [];
@@ -232,11 +250,9 @@ async function loadAbsensi() {
             }
         });
 
-        // Tanggal Indonesia utk banner
         const tglObj = new Date(tanggal + 'T00:00:00');
         const tglID = tglObj.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
-        // Banner ringkasan + varian warna
         let bannerClass = 'asb-none', bannerIcon = 'circle-dashed', bannerText = 'Belum ada rombel yang diabsen';
         if (rombelTotal > 0 && rombelSudah === rombelTotal) {
             bannerClass = 'asb-done'; bannerIcon = 'check-check';
@@ -264,7 +280,6 @@ async function loadAbsensi() {
             const jadwalData = jadwalByRombel[rombel.id] || [];
             const existingAbsen = absenByRombel[rombel.id] || [];
 
-            // Badge status rombel
             const sudah = existingAbsen.length > 0;
             const badge = jadwalData.length > 0
                 ? (sudah
@@ -490,9 +505,7 @@ async function hapusAbsenHariIni() {
 }
 
 /* ========================
-   HADIR SEMUA + AUTO-SAVE (v2)
-   SELALU menyimpan — radio default sudah "Hadir" sejak load,
-   jadi tidak melihat perubahan radio.
+   HADIR SEMUA + AUTO-SAVE
 ======================== */
 (function setupHadirSemua() {
 
@@ -543,7 +556,6 @@ async function hapusAbsenHariIni() {
         btn.innerHTML = '<i data-lucide="loader-2" class="spin-icon"></i> Menyimpan...';
         lucide.createIcons();
 
-        // 1. Paksa SEMUA radio ke "Hadir" (tanpa peduli sebelumnya apa)
         const rows = document.querySelectorAll('.kelas-table tbody tr');
         rows.forEach(row => {
             const jadwalId = row.dataset.jadwalId;
@@ -557,14 +569,12 @@ async function hapusAbsenHariIni() {
             }
         });
 
-        // 2. LANGSUNG SIMPAN — selalu, tanpa memandang ada/tidaknya perubahan
         try {
             await simpanSemuaAbsen();
         } catch (err) {
             showToast('Gagal menyimpan: ' + err.message, 'error');
         }
 
-        // 3. Pulihkan tombol
         const existing = document.getElementById('btnHadirSemua');
         if (existing) {
             existing.disabled = false;
